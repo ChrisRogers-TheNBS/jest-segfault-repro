@@ -14,7 +14,7 @@
 | **Jest** | `30.0.0-beta.6` through `30.3.0` (latest). Safe on `30.0.0-beta.5` (pure-JS resolver - does not utilise `unrs-resolver` package) |
 | **unrs-resolver** | `v1.7.11`, `v1.11.1` confirmed |
 | **Crash rate** | ~100% of runs with this reproduction |
-| **Crash timing** | ~80 - 100 seconds of runtime |
+| **Crash timing** | ~4 - 97 seconds of runtime |
 
 ## Quick start
 
