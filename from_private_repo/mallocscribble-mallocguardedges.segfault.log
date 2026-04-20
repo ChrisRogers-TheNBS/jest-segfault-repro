@@ -1,0 +1,35 @@
+# Segfault observed, running NodeJS v24.14.1 with env vars `MallocScribble=1 MallocGuardEdges=1` on macOS 26.4.1 with Jest v30.3.0
+
+PID 3645 received SIGSEGV for address: 0x6
+0   segfault-handler.node               0x0000000138a00ee4 _ZL16segfault_handleriP9__siginfoPv + 288
+1   libsystem_platform.dylib            0x000000018d9657a4 _sigtramp + 56
+2   node                                0x0000000104e46e94 _ZN2v88internal35ClearStaleLeftTrimmedPointerVisitor17VisitRootPointersENS0_4RootEPKcNS0_14FullObjectSlotES5_ + 80
+3   node                                0x0000000104d81a84 _ZNK2v88internal13InternalFrame7IterateEPNS0_11RootVisitorE + 240
+4   node                                0x0000000104d864f8 _ZN2v88internal7Isolate7IterateEPNS0_11RootVisitorEPNS0_14ThreadLocalTopE + 360
+5   node                                0x0000000104e47294 _ZN2v88internal4Heap12IterateRootsEPNS0_11RootVisitorENS_4base7EnumSetINS0_8SkipRootEiEENS1_16IterateRootsModeE + 928
+6   node                                0x0000000104ec3b94 _ZN2v88internal18ScavengerCollector14CollectGarbageEv + 2048
+7   node                                0x0000000104e40a58 _ZN2v88internal4Heap8ScavengeEv + 388
+8   node                                0x0000000104e3ff24 _ZN2v88internal4Heap24PerformGarbageCollectionENS0_16GarbageCollectorENS0_23GarbageCollectionReasonEPKc + 1016
+9   node                                0x0000000104e52074 _ZZN2v88internal4Heap14CollectGarbageENS0_15AllocationSpaceENS0_23GarbageCollectionReasonENS_15GCCallbackFlagsEENK3$_1clEv + 1164
+10  node                                0x0000000104e51bd0 _ZN4heap4base5Stack24SetMarkerAndCallbackImplIZN2v88internal4Heap14CollectGarbageENS4_15AllocationSpaceENS4_23GarbageCollectionReasonENS3_15GCCallbackFlagsEE3$_1EEvPS1_PvPKv + 40
+11  node                                0x00000001057716dc PushAllRegistersAndIterateStack + 40
+12  node                                0x0000000104e3c1b8 _ZN2v88internal4Heap14CollectGarbageENS0_15AllocationSpaceENS0_23GarbageCollectionReasonENS_15GCCallbackFlagsE + 724
+13  node                                0x0000000104e30fe4 _ZN2v88internal13HeapAllocator34AllocateRawWithRetryOrFailSlowPathEiNS0_14AllocationTypeENS0_16AllocationOriginENS0_19AllocationAlignmentE + 2380
+14  node                                0x0000000104e00d0c _ZN2v88internal11FactoryBaseINS0_7FactoryEE24AllocateRawWeakArrayListEiNS0_14AllocationTypeE + 64
+15  node                                0x0000000104e1dc6c _ZN2v88internal7Factory24CopyWeakArrayListAndGrowENS0_12DirectHandleINS0_13WeakArrayListEEEiNS0_14AllocationTypeE + 64
+16  node                                0x0000000105096b0c _ZN2v88internal13WeakArrayList11EnsureSpaceEPNS0_7IsolateENS0_6HandleIS1_EEiNS0_14AllocationTypeE + 56
+17  node                                0x0000000104e4adb8 _ZN2v88internal4Heap15AddRetainedMapsENS0_12DirectHandleINS0_13NativeContextEEENS0_18GlobalHandleVectorINS0_3MapEEE + 164
+18  node                                0x0000000104c88874 _ZN2v88internal23OptimizedCompilationJob34RegisterWeakObjectsInOptimizedCodeEPNS0_7IsolateENS0_12DirectHandleINS0_13NativeContextEEENS4_INS0_4CodeEEENS0_18GlobalHandleVectorINS0_3MapEEE + 72
+19  node                                0x0000000105458414 _ZN2v88internal6maglev20MaglevCompilationJob15FinalizeJobImplEPNS0_7IsolateE + 300
+20  node                                0x0000000104c955b0 _ZN2v88internal8Compiler28FinalizeMaglevCompilationJobEPNS0_6maglev20MaglevCompilationJobEPNS0_7IsolateE + 272
+21  node                                0x0000000106945564 _ZN2v88internal6maglev26MaglevConcurrentDispatcher20FinalizeFinishedJobsEv + 340
+22  node                                0x0000000104da6b4c _ZN2v88internal10StackGuard16HandleInterruptsENS1_14InterruptLevelE + 2696
+23  node                                0x0000000105298060 _ZN2v88internal25Runtime_StackGuardWithGapEiPmPNS0_7IsolateE + 308
+24  node                                0x0000000105862234 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit + 84
+25  node                                0x00000001057c5934 Builtins_BaselineOutOfLinePrologue + 116
+26  ???                                 0x0000000128fea6b8 0x0 + 4982744760
+27  ???                                 0x0000000128fb7c40 0x0 + 4982537280
+28  ???                                 0x0000000128fb7ffc 0x0 + 4982538236
+29  ???                                 0x0000000128f3ce24 0x0 + 4982033956
+30  ???                                 0x0000000128fb8144 0x0 + 4982538564
+31  node                                0x00000001057c4bec Builtins_InterpreterEntryTrampoline + 268

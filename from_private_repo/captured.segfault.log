@@ -1,0 +1,35 @@
+# First segfault observed, running NodeJS v24.14.1 on macOS 26.4.1 with Jest v30.3.0
+
+PID 57798 received SIGSEGV for address: 0x6
+0   segfault-handler.node               0x000000010b61cee4 _ZL16segfault_handleriP9__siginfoPv + 288
+1   libsystem_platform.dylib            0x000000018d9657a4 _sigtramp + 56
+2   node                                0x0000000104630780 _ZN2v88internal35ClearStaleLeftTrimmedPointerVisitor17VisitRootPointersENS0_4RootEPKcNS0_14FullObjectSlotES5_ + 80
+3   node                                0x00000001045779a8 _ZNK2v88internal13InternalFrame7IterateEPNS0_11RootVisitorE + 240
+4   node                                0x000000010457cc54 _ZN2v88internal7Isolate7IterateEPNS0_11RootVisitorEPNS0_14ThreadLocalTopE + 364
+5   node                                0x00000001046309ac _ZN2v88internal4Heap12IterateRootsEPNS0_11RootVisitorENS_4base7EnumSetINS0_8SkipRootEiEENS1_16IterateRootsModeE + 460
+6   node                                0x000000010464f494 _ZN2v88internal20MarkCompactCollector9MarkRootsEPNS0_11RootVisitorE + 56
+7   node                                0x000000010464ae1c _ZN2v88internal20MarkCompactCollector15MarkLiveObjectsEv + 968
+8   node                                0x000000010464a9c4 _ZN2v88internal20MarkCompactCollector14CollectGarbageEv + 128
+9   node                                0x00000001046299c0 _ZN2v88internal4Heap11MarkCompactEv + 420
+10  node                                0x0000000104629328 _ZN2v88internal4Heap24PerformGarbageCollectionENS0_16GarbageCollectorENS0_23GarbageCollectionReasonEPKc + 824
+11  node                                0x000000010463bd74 _ZZN2v88internal4Heap14CollectGarbageENS0_15AllocationSpaceENS0_23GarbageCollectionReasonENS_15GCCallbackFlagsEENK3$_1clEv + 1188
+12  node                                0x000000010463b8b8 _ZN4heap4base5Stack24SetMarkerAndCallbackImplIZN2v88internal4Heap14CollectGarbageENS4_15AllocationSpaceENS4_23GarbageCollectionReasonENS3_15GCCallbackFlagsEE3$_1EEvPS1_PvPKv + 40
+13  node                                0x0000000104ff1f10 PushAllRegistersAndIterateStack + 40
+14  node                                0x0000000104625720 _ZN2v88internal4Heap14CollectGarbageENS0_15AllocationSpaceENS0_23GarbageCollectionReasonENS_15GCCallbackFlagsE + 748
+15  node                                0x000000010459d0b8 _ZN2v88internal10StackGuard16HandleInterruptsENS1_14InterruptLevelE + 504
+16  node                                0x0000000104a8b564 _ZN2v88internal25Runtime_StackGuardWithGapEiPmPNS0_7IsolateE + 312
+17  node                                0x00000001050e2234 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit + 84
+18  node                                0x0000000105045934 Builtins_BaselineOutOfLinePrologue + 116
+19  ???                                 0x0000000127e2c518 0x0 + 4964140312
+20  node                                0x0000000105044bec Builtins_InterpreterEntryTrampoline + 268
+21  ???                                 0x0000000129552ca8 0x0 + 4988415144
+22  ???                                 0x0000000128450b68 0x0 + 4970580840
+23  ???                                 0x00000001282a2d28 0x0 + 4968820008
+24  node                                0x0000000105044bec Builtins_InterpreterEntryTrampoline + 268
+25  ???                                 0x0000000129552ca8 0x0 + 4988415144
+26  ???                                 0x0000000128450b68 0x0 + 4970580840
+27  ???                                 0x00000001282a2d28 0x0 + 4968820008
+28  node                                0x0000000105044bec Builtins_InterpreterEntryTrampoline + 268
+29  ???                                 0x0000000129552ca8 0x0 + 4988415144
+30  ???                                 0x0000000128450b68 0x0 + 4970580840
+31  ???                                 0x00000001282a2d28 0x0 + 4968820008

@@ -1,0 +1,34 @@
+PID 49893 received SIGSEGV for address: 0xe
+0   segfault-handler.node               0x000000010c48cee4 _ZL16segfault_handleriP9__siginfoPv + 288
+1   libsystem_platform.dylib            0x000000018d9657a4 _sigtramp + 56
+2   node                                0x0000000105268464 _ZN2v88internal35ClearStaleLeftTrimmedPointerVisitor17VisitRootPointersENS0_4RootEPKcNS0_14FullObjectSlotES5_ + 80
+3   node                                0x00000001051af6b8 _ZNK2v88internal13InternalFrame7IterateEPNS0_11RootVisitorE + 240
+4   node                                0x00000001051b4964 _ZN2v88internal7Isolate7IterateEPNS0_11RootVisitorEPNS0_14ThreadLocalTopE + 364
+5   node                                0x0000000105268690 _ZN2v88internal4Heap12IterateRootsEPNS0_11RootVisitorENS_4base7EnumSetINS0_8SkipRootEiEENS1_16IterateRootsModeE + 460
+6   node                                0x00000001052e51a8 _ZN2v88internal18ScavengerCollector14CollectGarbageEv + 1852
+7   node                                0x0000000105261b8c _ZN2v88internal4Heap8ScavengeEv + 388
+8   node                                0x0000000105261064 _ZN2v88internal4Heap24PerformGarbageCollectionENS0_16GarbageCollectorENS0_23GarbageCollectionReasonEPKc + 912
+9   node                                0x0000000105273a58 _ZZN2v88internal4Heap14CollectGarbageENS0_15AllocationSpaceENS0_23GarbageCollectionReasonENS_15GCCallbackFlagsEENK3$_1clEv + 1188
+10  node                                0x000000010527359c _ZN4heap4base5Stack24SetMarkerAndCallbackImplIZN2v88internal4Heap14CollectGarbageENS4_15AllocationSpaceENS4_23GarbageCollectionReasonENS3_15GCCallbackFlagsEE3$_1EEvPS1_PvPKv + 40
+11  node                                0x0000000105c29bf4 PushAllRegistersAndIterateStack + 40
+12  node                                0x000000010525d404 _ZN2v88internal4Heap14CollectGarbageENS0_15AllocationSpaceENS0_23GarbageCollectionReasonENS_15GCCallbackFlagsE + 748
+13  node                                0x0000000105252110 _ZN2v88internal13HeapAllocator34AllocateRawWithRetryOrFailSlowPathEiNS0_14AllocationTypeENS0_16AllocationOriginENS0_19AllocationAlignmentE + 2160
+14  node                                0x0000000105222728 _ZN2v88internal11FactoryBaseINS0_7FactoryEE24AllocateRawWeakArrayListEiNS0_14AllocationTypeE + 64
+15  node                                0x000000010523eef0 _ZN2v88internal7Factory24CopyWeakArrayListAndGrowENS0_12DirectHandleINS0_13WeakArrayListEEEiNS0_14AllocationTypeE + 72
+16  node                                0x00000001054b65e0 _ZN2v88internal13WeakArrayList8AddToEndEPNS0_7IsolateENS0_6HandleIS1_EENS0_23MaybeObjectDirectHandleENS0_6TaggedINS0_3SmiEEE + 112
+17  node                                0x00000001053f2aa0 _ZN2v88internal13DependentCode17InstallDependencyEPNS0_7IsolateENS0_6HandleINS0_4CodeEEENS4_INS0_10HeapObjectEEENS_4base5FlagsINS1_15DependencyGroupEjjEE + 120
+18  node                                0x00000001067d245c _ZN2v88internal8compiler23CompilationDependencies6CommitENS0_6HandleINS0_4CodeEEE + 288
+19  node                                0x0000000105840dc4 _ZN2v88internal6maglev14MaglevCompiler12GenerateCodeEPNS0_7IsolateEPNS1_21MaglevCompilationInfoE + 564
+20  node                                0x00000001058a3978 _ZN2v88internal6maglev20MaglevCompilationJob15FinalizeJobImplEPNS0_7IsolateE + 48
+21  node                                0x00000001050ba8a8 _ZN2v88internal8Compiler28FinalizeMaglevCompilationJobEPNS0_6maglev20MaglevCompilationJobEPNS0_7IsolateE + 272
+22  node                                0x00000001058a44bc _ZN2v88internal6maglev26MaglevConcurrentDispatcher20FinalizeFinishedJobsEv + 484
+23  node                                0x00000001051d5658 _ZN2v88internal10StackGuard16HandleInterruptsENS1_14InterruptLevelE + 2696
+24  node                                0x00000001056c3248 _ZN2v88internal25Runtime_StackGuardWithGapEiPmPNS0_7IsolateE + 312
+25  node                                0x0000000105d1a234 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit + 84
+26  node                                0x0000000105c7d934 Builtins_BaselineOutOfLinePrologue + 116
+27  ???                                 0x000000012fe6ce98 0x0 + 5098622616
+28  ???                                 0x000000012f30f074 0x0 + 5086703732
+29  ???                                 0x000000012f878b88 0x0 + 5092379528
+30  node                                0x0000000105d49e60 Builtins_ArrayMap + 1216
+31  ???                                 0x000000012f705464 0x0 + 5090858084
+[1]    49873 segmentation fault  npx jest --detectOpenHandles
