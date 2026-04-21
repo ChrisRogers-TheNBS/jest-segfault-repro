@@ -1,32 +1,59 @@
 # jest + unrs - segfault repro
 
 > [!NOTE]
-> AI disclosure:
-> The vast majority of this repro was created using Claude (Sonnet & Opus) 4.6. Everything below this section and anything not in the [from_real_world_repo/](./from_real_world_repo/) dir has been touched on, or created by AI in some way.
+> AI disclosure: The vast majority of this repro was created using Claude (Sonnet & Opus) 4.6. Everything below this section and anything not in the [from_real_world_repo/](./from_real_world_repo/) dir has been touched on, or created by AI in some way.
 >
 > While the segfault does appear to be happening within Node.js, it's a bit beyond my skill level to confidently claim the bug is in V8's Sparkplug. Thus root cause identified below is what Claude has determined.
 >
-> I supplied all version numbers used for testing.
+> I supplied all version numbers used for testing, these have all been manually verified.
 >
-> Claude also seemed to want to keep the [patch-jest-resolve.js](./patch-jest-resolve.js) script, although this not necessary to trigger a segfault, so I've removed it from the npm postinstall script.
+> Claude also seemed to want to keep the [patch-jest-resolve.js](./patch-jest-resolve.js) script, although this not necessary to trigger a segfault, so I've removed it from the npm postinstall script, but still remains as an optional npm run script.
 
 ---
 
 **Reliably reproduces** a `SIGSEGV` crash in V8 Sparkplug triggered by the introduction of `unrs-resolver` in Jest ≥ `30.0.0-beta.6` via [jestjs/jest#15619](https://github.com/jestjs/jest/pull/15619).
 
-> **Root cause:** V8 Sparkplug (Baseline JIT) leaves a stale near-null pointer in an `InternalFrame` slot. When GC fires and `ClearStaleLeftTrimmedPointerVisitor` scans stack roots, it dereferences the stale slot and segfaults. `unrs-resolver`'s NAPI object churn creates the heap pressure that triggers this. Running with `--no-sparkplug` prevents the crash entirely. This is a **V8 bug**, not a bug in `napi-rs` or `unrs-resolver`.
+> **Claude's Root cause verdict:** V8 Sparkplug (Baseline JIT) leaves a stale near-null pointer in an `InternalFrame` slot. When GC fires and `ClearStaleLeftTrimmedPointerVisitor` scans stack roots, it dereferences the stale slot and segfaults. `unrs-resolver`'s NAPI object churn creates the heap pressure that triggers this. Running with `--no-sparkplug` prevents the crash entirely. This is a **V8 bug**, not a bug in `napi-rs` or `unrs-resolver`.
 
 ## Environment
 
-| | |
-| --- | --- |
-| **OS** | macOS arm64 (Apple Silicon) |
-| **Hardware** | Apple M3 Pro - 18GB Memory |
-| **Node** | Reproduced on Node `22.12.0`, `24.14.1` and `24.15.0`. **Unable to reproduce on `25.9.0`** |
-| **Jest** | `30.0.0-beta.6` through `30.3.0` (latest). Safe on `30.0.0-beta.5` and earlier v29 versions (pure-JS resolver - does not utilise `unrs-resolver` package) |
-| **unrs-resolver** | `v1.7.11`, `v1.11.1` confirmed |
-| **Crash rate** | ~100% of runs with this reproduction |
-| **Crash timing** | ~5 - 100 seconds of test runtime |
+Most testing has been done on the M3 Pro with Node.js `v24.14.1`.
+
+### Tested Node.js versions
+
+| Node.js Version | Status | Run count | Device |
+| --- | --- | --- | --- |
+| 22.12.0 | pass | 5 | M3 Pro |
+| 22.13.0 | pass | 5 | M3 Pro |
+| 22.17.0 | pass | 5 | M3 Pro |
+| 22.22.2 | pass | 5 | M3 Pro |
+| 23.0.0 | pass | 5 | M3 Pro |
+| 24.0.0 | crash | 5 | M3 Pro |
+| 24.8.0 | crash | 5 | M3 Pro |
+| 24.8.0 | pass | 1 | M4 Pro |
+| 24.11.0 | crash | 5 | M3 Pro |
+| 24.14.1 | crash | many | M3 Pro |
+| 24.14.1 | crash | 1 | M4 Pro |
+| 24.15.0 | crash | many | M3 Pro |
+| 25.0.0 | pass | 5 | M3 Pro |
+| 25.15.0 | pass | many | M3 Pro |
+
+### Hardware
+
+| Device | OS | Arch | System Memory |
+| --- | --- | --- | --- |
+| Apple M3 Pro | Tahoe 26.4.1 | arm64 | 18GB |
+| Apple M4 Pro | Tahoe 26.4.1 | arm64 | 48GB |
+
+### Package info
+
+| Package | Version | Info | Status |
+| --- | --- | --- | --- |
+| Jest | <= `30.0.0-beta.5` | pure-JS resolver - does not utilise `unrs-resolver` package | pass |
+| Jest | >= `30.0.0-beta.6` | `unrs-resolver` package introduced | crash |
+| Jest | `30.3.0` (latest) | `unrs-resolver` still present | crash |
+| unrs-resolver | `v1.7.11` | First version Jest supported | crash |
+| unrs-resolver | `v1.11.1` | Latest version | crash |
 
 ## Quick start
 
@@ -38,7 +65,7 @@ npm run test:crash:loop           # loop 50 attempts
 npm run test:safe:nosparkplug     # --no-sparkplug → no crash (confirms root cause)
 ```
 
-Or simply: `npx jest` — on Node `24.14.1` (extensively tested) this alone is sufficient to trigger a segfault, without any special flags.
+Or simply: `npx jest` - on Node `24.14.1` (extensively tested) this alone is sufficient to trigger a segfault, without any special flags.
 
 ## How the reproduction works
 
