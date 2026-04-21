@@ -1,20 +1,32 @@
-# jest-unrs-segfault-repro
+# jest + unrs - segfault repro
 
-**Reliably reproduces** a `SIGSEGV` crash in V8 Sparkplug triggered by Jest ≥ `30.0.0-beta.6` via [jestjs/jest#15619](https://github.com/jestjs/jest/pull/15619).
+> [!NOTE]
+> AI disclosure:
+> The vast majority of this repro was created using Claude (Sonnet & Opus) 4.6. Everything below this section and anything not in the [from_real_world_repo/](./from_real_world_repo/) dir has been touched on, or created by AI in some way.
+>
+> While the segfault does appear to be happening within Node.js, it's a bit beyond my skill level to confidently claim the bug is in V8's Sparkplug. Thus root cause identified below is what Claude has determined.
+>
+> I supplied all version numbers used for testing.
+>
+> Claude also seemed to want to keep the [patch-jest-resolve.js](./patch-jest-resolve.js) script, although this not necessary to trigger a segfault, so I've removed it from the npm postinstall script.
+
+---
+
+**Reliably reproduces** a `SIGSEGV` crash in V8 Sparkplug triggered by the introduction of `unrs-resolver` in Jest ≥ `30.0.0-beta.6` via [jestjs/jest#15619](https://github.com/jestjs/jest/pull/15619).
 
 > **Root cause:** V8 Sparkplug (Baseline JIT) leaves a stale near-null pointer in an `InternalFrame` slot. When GC fires and `ClearStaleLeftTrimmedPointerVisitor` scans stack roots, it dereferences the stale slot and segfaults. `unrs-resolver`'s NAPI object churn creates the heap pressure that triggers this. Running with `--no-sparkplug` prevents the crash entirely. This is a **V8 bug**, not a bug in `napi-rs` or `unrs-resolver`.
 
 ## Environment
 
 | | |
-|---|---|
+| --- | --- |
 | **OS** | macOS arm64 (Apple Silicon) |
 | **Hardware** | Apple M3 Pro - 18GB Memory |
-| **Node** | Reproduced on Node 22.X, `24.14.1` and `24.15.0` |
-| **Jest** | `30.0.0-beta.6` through `30.3.0` (latest). Safe on `30.0.0-beta.5` (pure-JS resolver - does not utilise `unrs-resolver` package) |
+| **Node** | Reproduced on Node `22.12.0`, `24.14.1` and `24.15.0`. **Unable to reproduce on `25.9.0`** |
+| **Jest** | `30.0.0-beta.6` through `30.3.0` (latest). Safe on `30.0.0-beta.5` and earlier v29 versions (pure-JS resolver - does not utilise `unrs-resolver` package) |
 | **unrs-resolver** | `v1.7.11`, `v1.11.1` confirmed |
 | **Crash rate** | ~100% of runs with this reproduction |
-| **Crash timing** | ~4 - 97 seconds of runtime |
+| **Crash timing** | ~5 - 100 seconds of test runtime |
 
 ## Quick start
 
@@ -26,7 +38,7 @@ npm run test:crash:loop           # loop 50 attempts
 npm run test:safe:nosparkplug     # --no-sparkplug → no crash (confirms root cause)
 ```
 
-Or simply: `npx jest` — crashes without any special flags.
+Or simply: `npx jest` — on Node `24.14.1` (extensively tested) this alone is sufficient to trigger a segfault, without any special flags.
 
 ## How the reproduction works
 
@@ -46,7 +58,7 @@ Or simply: `npx jest` — crashes without any special flags.
 ### Files
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `patch-jest-resolve.js` | Disables resolver caching (`getResolver` → `undefined`) |
 | `generate-tests.js` | Generates 500 source modules + 200 test files |
 | `warm-cache.js` | Primes ts-jest transform cache during `postinstall` |
@@ -58,17 +70,17 @@ Or simply: `npx jest` — crashes without any special flags.
 ## Diagnostic test matrix
 
 | Configuration | Result | Conclusion |
-|---|---|---|
+| --- | --- | --- |
 | Default run (4 workers) | **SIGSEGV** | Baseline crash |
 | `MallocScribble=1 MallocGuardEdges=1` | **SIGSEGV at same address** | Rules out userspace heap corruption |
-| `--no-maglev` | **Still crashes** (faster) | Rules out Maglev JIT |
+| `--no-maglev` | **Still crashes** | Rules out Maglev JIT |
 | `--no-sparkplug` | **No crash** | Confirms Sparkplug as the root cause |
 | `--detectOpenHandles` (1 worker) | **SIGSEGV** | Not a concurrency bug — single process crashes too |
 | Jest `30.0.0-beta.5` | No crash | Uses pure-JS `resolve` — no NAPI churn |
 
 ## Crash trace (representative)
 
-```
+```log
 v8::ClearStaleLeftTrimmedPointerVisitor::VisitRootPointers  ← SIGSEGV at 0x6
 v8::InternalFrame::Iterate
 v8::Heap::IterateRoots
@@ -83,9 +95,18 @@ The faulting address is always near-null (`0x6`, `0xe`) — a stale tagged point
 
 ## Workarounds
 
-**Disable Sparkplug** (recommended):
+### Use Current branch of Node.js
+
+Update Node to `v25.9.0` and the segfault is no longer reproducible.
+
+### Disable Sparkplug
+
+This tested as working for Node `v24.14.1` & `v24.15.0`.
+
 ```bash
 node --no-sparkplug ./node_modules/.bin/jest
 ```
 
-**Or** downgrade to Jest `30.0.0-beta.5` which uses the pure-JS `resolve` package instead of `unrs-resolver`.
+### Downgrade Jest
+
+Jest `v30.0.0-beta.5` and earlier `v29` releases uses the pure-JS `resolve` package instead of `unrs-resolver` which also doesn't reproduce this segfault issue.

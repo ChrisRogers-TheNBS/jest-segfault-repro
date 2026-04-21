@@ -4,8 +4,10 @@
   "private": true,
   "description": "Minimal reproduction of SIGSEGV in V8 Sparkplug triggered by unrs-resolver NAPI churn under Jest",
   "scripts": {
-    "postinstall": "node patch-jest-resolve.js && node generate-tests.js && node warm-cache.js",
+    "postinstall": "node generate-tests.js && node warm-cache.js",
     "generate": "node generate-tests.js",
+    "test": "npx jest",
+    "patch-jest-resolver": "node patch-jest-resolve.js",
     "test:crash": "node --no-maglev --max-old-space-size=256 ./node_modules/.bin/jest",
     "test:crash:loop": "for i in $(seq 1 50); do echo \"=== attempt $i ===\"; node --no-maglev --max-old-space-size=256 ./node_modules/.bin/jest || { echo '*** CRASHED on attempt '$i' ***'; exit 1; }; done; echo 'No crash after 50 attempts'",
     "test:crash:detect": "node --no-maglev --max-old-space-size=256 ./node_modules/.bin/jest --detectOpenHandles --maxWorkers=1",
